@@ -20,9 +20,10 @@
 #define DOCKSPACE_ID "MyDockSpace"
 #define WINNAME_RF "RF Test Tool"
 
-#define USB_UID_EP_MPS              (64)
-#define USB_HID_REPORT_SIZE         (64)
-#define USB_HID_REPORT_ID           (0x3F)
+#define USB_UID_EP_MPS              (32)
+#define USB_HID_REPORT_SIZE         (33)
+
+#define USB_HID_REPORT_ID           (0x00)
 #define USB_HID_REPORT_CONTENT_SIZE (USB_HID_REPORT_SIZE - 1)   //ReportID:1
 
 #define LOG_INFO

@@ -234,7 +234,6 @@ void RFToolApplication::ShowRFWindow(bool* p_open)
 
 	ImGui::InputText("VID", vid_buff, 5);
 	ImGui::InputText("PID", pid_buff, 5);
-	ImGui::InputText("Report ID", rid_buff, 3);
 	if (ImGui::Button(u8"…Ë∂®")) {
 		strcpy_s(result_find_dev_buff, 8, "");
 		if (ResultCode::SUCCESS == BtnScanClicked()) {
@@ -249,10 +248,8 @@ void RFToolApplication::ShowRFWindow(bool* p_open)
 
 	utils::ValidateU16Text(vid_buff, vid);
 	utils::ValidateU16Text(pid_buff, pid);
-	utils::ValidateU8Text(rid_buff, rid);
 	sprintf_s(vid_buff, 5, "%04X", vid);
 	sprintf_s(pid_buff, 5, "%04X", pid);
-	sprintf_s(rid_buff, 3, "%02X", rid);
 
 
 
@@ -563,7 +560,7 @@ void RFToolApplication::ShowRootWindow(bool* p_open)
 ResultCode RFToolApplication::BtnScanClicked()
 {
 	HIDDevice dev;
-	auto ret = OpenHIDInterface(vid, pid, rid, &dev);
+	auto ret = OpenHIDInterface(vid, pid, &dev);
 	if (ret != HID_FIND_SUCCESS) {
 		return ResultCode::FAILED_FIND_DEV;
 	}
@@ -582,10 +579,10 @@ std::vector<uint8_t> RFToolApplication::GenCommand(bool is_start)
 	uint8_t* buffer = temp.data();
 	memset(buffer, USB_HID_REPORT_CONTENT_SIZE, 0);
 	int i = 0;
-	buffer[i++] = 0x04; //
+	buffer[i++] = RET_HEADER; //
 	buffer[i++] = 0xFF; // Check sum lsb
 	buffer[i++] = 0xFF; // Check sum msb
-	buffer[i++] = 0xB0;
+	buffer[i++] = RET_PACKET_CODE;
 	*(uint32_t*)(buffer + i) = 55; i += 4;	// len
 	buffer[i++] = is_start   ? 0x01 : 0x00;	// start:0x01, stop:0x00
 	buffer[i++] = tx_rx_mode;				// tx:0x00, rx:0x01
@@ -696,9 +693,9 @@ ResultCode RFToolApplication::BtnStartClicked()
 
 		if (ret == 0)
 			return ResultCode::GET_REPORT_TIMEOUT;
-		if (rsp[0] != 0x04)
+		if (rsp[0] != RET_HEADER)
 			return ResultCode::UNEXPECTED_RSP;
-		if (rsp[3] != 0xB0)
+		if (rsp[3] != RET_PACKET_CODE)
 			return ResultCode::UNEXPECTED_RSP;
 		if (rsp[8] == 0)
 			return ResultCode::SUCCESS;
@@ -727,9 +724,9 @@ ResultCode RFToolApplication::BtnStopClicked(uint16_t* rx_packet_num)
 
 		if (ret == 0)
 			return ResultCode::GET_REPORT_TIMEOUT;
-		if (rsp[0] != 0x04)
+		if (rsp[0] != RET_HEADER)
 			return ResultCode::UNEXPECTED_RSP;
-		if (rsp[3] != 0xB0)
+		if (rsp[3] != RET_PACKET_CODE)
 			return ResultCode::UNEXPECTED_RSP;
 
 		*rx_packet_num = *(uint16_t*)(rsp + 9);

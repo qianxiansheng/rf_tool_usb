@@ -100,11 +100,11 @@ int hid_get_report(hid_device* dev, uint8_t* data, uint32_t size, int timeout)
 {
 	assert(size <= USB_HID_REPORT_CONTENT_SIZE);
 
-	int r = hid_read_timeout(dev, hid_report_buf, USB_HID_REPORT_SIZE, timeout);
+	int r = hid_read_timeout(dev, hid_report_buf + 1, USB_HID_REPORT_SIZE, timeout);
 	if (data != hid_report_buf + 1)
 		memcpy(data, hid_report_buf + 1, size);
 	logger->debug("ret:{}", r);
-	logger->debug("hid_set_report {:n}", spdlog::to_hex(hid_report_buf, hid_report_buf + USB_HID_REPORT_SIZE));
+	logger->debug("hid_get_report {:n}", spdlog::to_hex(hid_report_buf, hid_report_buf + USB_HID_REPORT_SIZE));
 	return r;
 }
 
@@ -124,14 +124,11 @@ HIDFindResultEnum OpenHIDInterface(uint16_t vid, uint16_t pid, HIDDevice* hid)
 			if (res < 0)
 				continue;
 			logger->info("Report Descriptor: {:n}", spdlog::to_hex(descriptor, descriptor + res));
-			if (!ValidateReportID(descriptor, res, hid))
-				continue;
-			logger->info("reportId: {:x}", hid->reportId);
 			if (!ValidateUsage(descriptor, res, hid))
 				continue;
 			logger->info("usage: {:x}", hid->usage);
 
-			if (hid->usage != 0xFF00)
+			if (hid->usage != 0xFF60)
 				continue;
 
 			logger->info("OK!");
@@ -141,48 +138,6 @@ HIDFindResultEnum OpenHIDInterface(uint16_t vid, uint16_t pid, HIDDevice* hid)
 	}
 
 	hid_free_enumeration(hid_device_list);
-	return HID_OPEN_FAILED;
-}
-
-HIDFindResultEnum OpenHIDInterface(uint16_t vid, uint16_t pid, uint8_t reportId, HIDDevice* hid)
-{
-	hid_device_info* hid_device_list = hid_enumerate(0, 0);
-	hid_device_info* p = hid_device_list;
-
-	uint8_t descriptor[HID_API_MAX_REPORT_DESCRIPTOR_SIZE];
-	int res = 0;
-
-	for (;p != NULL; p = p->next)
-	{
-		logger->info("DEV: VID:{:x} PID:{:x}==", vid, pid);
-		if (ValidateVPID(p->path, vid, pid))
-		{
-			hid_device* dev = hid_open_path(p->path);
-
-			res = hid_get_report_descriptor(dev, descriptor, sizeof(descriptor));
-			if (res < 0)
-				continue;
-			logger->info("Report Descriptor: {:n}", spdlog::to_hex(descriptor, descriptor + res));
-			if (!ValidateReportID(descriptor, res, hid))
-				continue;
-			logger->info("reportId: {:x}", hid->reportId);
-			if (!ValidateUsage(descriptor, res, hid))
-				continue;
-			logger->info("usage: {:x}", hid->usage);
-
-			if (hid->usage != 0xFF00)
-				continue;
-			if (reportId != hid->reportId)
-				continue;
-
-			logger->info("OK!");
-			hid->phandle = dev;
-			return HID_FIND_SUCCESS;
-		}
-	}
-
-	hid_free_enumeration(hid_device_list);
-
 	return HID_OPEN_FAILED;
 }
 

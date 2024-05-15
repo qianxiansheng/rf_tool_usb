@@ -70,6 +70,9 @@ enum CARRIER_MODE {
 	CARRIER = 0x00,
 };
 
+#define RET_HEADER                0xBB
+#define RET_PACKET_CODE           0xb0
+
 class RFToolApplication : public ApplicationBase
 {
 private:
