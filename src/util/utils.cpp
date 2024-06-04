@@ -267,6 +267,14 @@ void utils::String2Hex(const char* src, unsigned char* dest, int srcL)
 		dest[i] = htoi_8(src + (i * 2));
 }
 
+uint8_t utils::checksum8(uint8_t* buffer, uint32_t size)
+{
+	uint8_t sum = 0;
+	while (size-- > 0) {
+		sum += *buffer++;
+	}
+	return sum;
+}
 uint16_t utils::checksum16(uint8_t* buffer, uint32_t size)
 {
 	uint16_t sum = 0;

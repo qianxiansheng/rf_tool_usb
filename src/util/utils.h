@@ -31,6 +31,7 @@ namespace utils {
 	unsigned char Hex2String(const unsigned char* pSrc, unsigned char* dest, int nL);
 	void String2Hex(const char* src, unsigned char* dest, int srcL);
 
+	uint8_t checksum8(uint8_t* buffer, uint32_t size);
 	uint16_t checksum16(uint8_t* buffer, uint32_t size);
 
 	//std::wstring utf8_to_wstr(const std::string& src);

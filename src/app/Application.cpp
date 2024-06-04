@@ -577,13 +577,10 @@ std::vector<uint8_t> RFToolApplication::GenCommand(bool is_start)
 {
 	std::vector<uint8_t> temp(USB_HID_REPORT_CONTENT_SIZE);
 	uint8_t* buffer = temp.data();
-	memset(buffer, USB_HID_REPORT_CONTENT_SIZE, 0);
+	memset(buffer, 0, USB_HID_REPORT_CONTENT_SIZE);
 	int i = 0;
-	buffer[i++] = RET_HEADER; //
-	buffer[i++] = 0xFF; // Check sum lsb
-	buffer[i++] = 0xFF; // Check sum msb
-	buffer[i++] = RET_PACKET_CODE;
-	*(uint32_t*)(buffer + i) = 55; i += 4;	// len
+	buffer[i++] = VIA_HEADER; //
+	buffer[i++] = VIA_PACKET_CODE;
 	buffer[i++] = is_start   ? 0x01 : 0x00;	// start:0x01, stop:0x00
 	buffer[i++] = tx_rx_mode;				// tx:0x00, rx:0x01
 	buffer[i++] = combo_items_payload_model[combo_payload_model_current_idx].value;
@@ -607,7 +604,7 @@ std::vector<uint8_t> RFToolApplication::GenCommand(bool is_start)
 	buffer[i++] = combo_items_tx_power[combo_tx_power_current_idx].value;
 	buffer[i++] = combo_items_phy[combo_phy_current_idx].value;
 
-	*(uint16_t*)(buffer + 1) = utils::checksum16(buffer + 3, 60);
+	buffer[i++] = utils::checksum8(buffer, 31);
 
 	if (is_start) 
 	{
@@ -693,11 +690,11 @@ ResultCode RFToolApplication::BtnStartClicked()
 
 		if (ret == 0)
 			return ResultCode::GET_REPORT_TIMEOUT;
-		if (rsp[0] != RET_HEADER)
+		if (rsp[0] != VIA_HEADER)
 			return ResultCode::UNEXPECTED_RSP;
-		if (rsp[3] != RET_PACKET_CODE)
+		if (rsp[1] != VIA_PACKET_CODE)
 			return ResultCode::UNEXPECTED_RSP;
-		if (rsp[8] == 0)
+		if (rsp[2] == 0)
 			return ResultCode::SUCCESS;
 		else
 			return ResultCode::CMD_RET_CODE_UNEXPECTED_ERRPR;
@@ -724,14 +721,14 @@ ResultCode RFToolApplication::BtnStopClicked(uint16_t* rx_packet_num)
 
 		if (ret == 0)
 			return ResultCode::GET_REPORT_TIMEOUT;
-		if (rsp[0] != RET_HEADER)
+		if (rsp[0] != VIA_HEADER)
 			return ResultCode::UNEXPECTED_RSP;
-		if (rsp[3] != RET_PACKET_CODE)
+		if (rsp[1] != VIA_PACKET_CODE)
 			return ResultCode::UNEXPECTED_RSP;
 
-		*rx_packet_num = *(uint16_t*)(rsp + 9);
+		*rx_packet_num = *(uint16_t*)(rsp + 3);
 
-		if (rsp[8] == 0)
+		if (rsp[2] == 0)
 			return ResultCode::SUCCESS;
 		else
 			return ResultCode::CMD_RET_CODE_UNEXPECTED_ERRPR;
