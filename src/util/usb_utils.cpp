@@ -43,7 +43,7 @@ bool usb::is_ingchips_keyboard_device(libusb_device* device)
 
 int usb::transfer_data(libusb_device* dev, uint8_t _interface, uint8_t ep, uint8_t* data, int data_size, int timeout)
 {
-	logger->trace("usb::transfer_data({0:x}, {1}, {2}, {3:x}, {4}, {5})", (uint64_t)dev, (int)_interface, (int)ep, (int)data, data_size, timeout);
+	logger->trace("usb::transfer_data({0:x}, {1}, {2}, {3:x}, {4}, {5})", (uint64_t)dev, (int)_interface, (int)ep, (uint64_t)data, data_size, timeout);
 	int actual_length = 0;
 	libusb_device_handle* handler = NULL;
 
@@ -85,7 +85,7 @@ libusb_device* usb::find_device(libusb_context* libusb_ctx, uint16_t vid, uint16
 	// enumerate all device
 	cnt = libusb_get_device_list(libusb_ctx, &libusb_device_list);
 
-	for (int i = 0; i < cnt; ++i)
+	for (size_t i = 0; i < cnt; ++i)
 	{
 		struct libusb_device_descriptor desc;
 		if (LIBUSB_SUCCESS != libusb_get_device_descriptor(libusb_device_list[i], &desc))
@@ -120,7 +120,7 @@ libusb_device* usb::find_device(libusb_context* libusb_ctx, uint16_t vid, uint16
 	// enumerate all device
 	cnt = libusb_get_device_list(libusb_ctx, &libusb_device_list);
 
-	for (int i = 0; i < cnt; ++i)
+	for (size_t i = 0; i < cnt; ++i)
 	{
 		struct libusb_device_descriptor desc;
 		if (LIBUSB_SUCCESS != libusb_get_device_descriptor(libusb_device_list[i], &desc))
@@ -168,7 +168,7 @@ usb::DevMap usb::enumrate_device_map(libusb_context* libusb_ctx)
 	// enumerate all device
 	cnt = libusb_get_device_list(libusb_ctx, &libusb_device_list);
 
-	for (int i = 0; i < cnt; ++i)
+	for (size_t i = 0; i < cnt; ++i)
 	{
 		if (is_ingchips_keyboard_device(libusb_device_list[i]))
 		{

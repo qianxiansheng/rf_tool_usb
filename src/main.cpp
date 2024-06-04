@@ -85,7 +85,7 @@ inline float dpiScale()
     return g_dpi_scale;
 }
 
-std::shared_ptr<spdlog::logger> logger;
+//std::shared_ptr<spdlog::logger> logger;
 BOOL GetNtVersionNumbers(DWORD& dwMajorVer, DWORD& dwMinorVer, DWORD& dwBuildNumber)
 {
     BOOL bRet = FALSE;
@@ -128,7 +128,7 @@ int GetWindowDpi(HWND hWnd)
     DWORD dwMajorVer, dwMinorVer, dwBuildNumber;
     if (GetNtVersionNumbers(dwMajorVer, dwMinorVer, dwBuildNumber)) {
 
-        logger->info("win version number:{0}, {1}", dwMajorVer, dwMinorVer);
+        //logger->info("win version number:{0}, {1}", dwMajorVer, dwMinorVer);
 
         if (dwMajorVer == 10 && dwMinorVer == 0) {
             return GetDpiForWindow_Load(hWnd);
@@ -150,7 +150,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance,
     LOG_INFO("START");
     try {
         // log
-        logger = spdlog::basic_logger_mt("temp", "temp_log.txt");
+        //logger = spdlog::basic_logger_mt("temp", "temp_log.txt");
 
         UNREFERENCED_PARAMETER(hPrevInstance);
         UNREFERENCED_PARAMETER(lpCmdLine);
@@ -189,7 +189,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance,
 
 #if PROGRAM_HANDLER_DPI 
         float dpi = (float)GetWindowDpi(hWnd);
-        logger->info("dpi:{}", dpi);
+        //logger->info("dpi:{}", dpi);
         UpdateDPI(dpi);
 #endif
 
