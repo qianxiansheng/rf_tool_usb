@@ -1,4 +1,0 @@
-[2024-03-20 18:34:55.676] [temp] [info] win version number:10, 0
-[2024-03-20 18:34:55.682] [temp] [info] dpi:144
-[2024-03-20 18:37:36.648] [temp] [info] win version number:10, 0
-[2024-03-20 18:37:36.652] [temp] [info] dpi:144
